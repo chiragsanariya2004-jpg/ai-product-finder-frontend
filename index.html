@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Product Finder</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f4f4;
+            padding: 20px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            width: 300px;
+        }
+        .product {
+            background: white;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>AI Product Finder 🔍</h2>
+
+<input id="query" placeholder="What are you looking for?" />
+<br>
+<input id="budget" type="number" placeholder="Enter budget" />
+<br>
+<button onclick="findProduct()">Find Products</button>
+
+<div id="result"></div>
+
+<script>
+async function findProduct() {
+    const query = document.getElementById("query").value;
+    const budget = document.getElementById("budget").value;
+
+    if (!query || !budget) {
+        alert("Query aur budget dono bharo");
+        return;
+    }
+
+    const response = await fetch("http://127.0.0.1:8000/find-product", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            query: query,
+            budget: Number(budget)
+        })
+    });
+
+    const data = await response.json();
+
+    let html = "";
+
+    data.products.forEach(p => {
+        html += `
+        <div class="product">
+            <h3>${p.name}</h3>
+            <p>💰 Price: ${p.price}</p>
+            <p>⭐ Rating: ${p.rating}</p>
+            <p><b>Best for:</b> ${p.best_for}</p>
+        </div>
+        `;
+    });
+    html += `<h3>✅ Final Recommendation: ${data.final_recommendation}</h3>`;
+    html += `<p>${data.reason}</p>`; 
+    
+    document.getElementById("result").innerHTML = html;
+}
+</script>
+
+
+</body>
+</html>
