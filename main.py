@@ -37,6 +37,11 @@ def get_db():
 def home():
     return {"message": "AI Product Finder API is running"}
 
+@app.get("/products")
+def get_products(db: Session = Depends(get_db)):
+    products = db.query(Product).all()
+    return products
+
 # request body structure
 class ProductRequest(BaseModel):
     query: str
