@@ -42,6 +42,17 @@ def get_products(db: Session = Depends(get_db)):
     products = db.query(Product).all()
     return products
 
+@app.post("/seed")
+def seed_products(db: Session = Depends(get_db)):
+    p1 = Product(name="HP Laptop", price=48000, rating=4.3, best_for="Students")
+    p2 = Product(name="Dell Laptop", price=52000, rating=4.4, best_for="Office")
+    p3 = Product(name="Lenovo Laptop", price=45000, rating=4.2, best_for="Coding")
+
+    db.add_all([p1, p2, p3])
+    db.commit()
+
+    return {"message": "Products seeded successfully"}
+
 # request body structure
 class ProductRequest(BaseModel):
     query: str
@@ -53,17 +64,6 @@ def find_product(
     data: ProductRequest,
     db: Session = Depends(get_db)
  ):
-
- @app.post("/seed")
- def seed_products(db: Session = Depends(get_db)):
-    p1 = Product(name="HP Laptop", price=48000, rating=4.3, best_for="Students")
-    p2 = Product(name="Dell Laptop", price=52000, rating=4.4, best_for="Office")
-    p3 = Product(name="Lenovo Laptop", price=45000, rating=4.2, best_for="Coding")
-
-    db.add_all([p1, p2, p3])
-    db.commit()
-
-    return {"message": "Products seeded successfully"}
    
     if not GROQ_API_KEY:
         return {
