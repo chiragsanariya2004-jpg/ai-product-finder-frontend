@@ -44,14 +44,12 @@ def get_products(db: Session = Depends(get_db)):
 
 @app.post("/seed")
 def seed_products(db: Session = Depends(get_db)):
-    existing = db.query(Product).first()
-    if existing:
-        return {"message": "Products already seeded"}
+    db.query(Product).delete()
 
     products = [
-        Product(name="HP Laptop", price=48000, rating=4.3, best_for="Students"),
-        Product(name="Dell Laptop", price=52000, rating=4.4, best_for="Office"),
-        Product(name="Lenovo Laptop", price=45000, rating=4.2, best_for="Coding"),
+        Product(name="Redmi Note 13", price=12000, rating=4.2, best_for="Budget users"),
+        Product(name="Samsung Galaxy M14", price=13500, rating=4.3, best_for="Battery life"),
+        Product(name="Realme Narzo 60", price=15000, rating=4.1, best_for="Performance"),
     ]
 
     db.add_all(products)
@@ -82,6 +80,7 @@ def find_product(
     filtered_products = (
     db.query(Product)
     .filter(Product.price <= budget)
+    .filter(Product.name.ilike(f"%{query}%"))
     .limit(3)
     .all()
 )
@@ -174,12 +173,26 @@ Rules:
             "error": "AI response is not valid JSON",
             "raw_ai_reply": ai_text
         }
+    
+    # 🔒 SAFETY FILTER (budget cross na ho)
+    safe_products = [
+        p for p in ai_json.get("products", [])
+        if p.get("price", 0) <= budget
+]
+
+    if not safe_products:
+        return {
+            "query": data.query,
+            "budget": data.budget,
+            "products": [],
+            "final_recommendation": "No product found",
+            "reason": "No products available within the given budget"
+        }
 
     return {
         "query": data.query,
         "budget": data.budget,
-        "products": ai_json.get("products", []),
-        "final_recommendation": ai_json.get("final_recommendation"),
+        "products": safe_products,
+        "final_recommendation": safe_products[0]["name"],
         "reason": ai_json.get("reason")
     }
-
