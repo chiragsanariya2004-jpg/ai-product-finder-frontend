@@ -45,5 +45,5 @@ based on their **query** and **budget** using an AI-powered backend.
 
 ---
 
-## 🧪 API Used
+## 🧪 API Used 
 
