@@ -159,88 +159,70 @@
   </div>
 
   <script>
-  async function findProduct() {
-  const query = document.getElementById("query").value.trim();
-  const budget = Number(document.getElementById("budget").value);
-  const btn = document.getElementById("findBtn");
-  const resultDiv = document.getElementById("result");
-  const loader = document.getElementById("loader");
+async function findProduct() {
+    const query = document.getElementById("query").value.trim();
+    const budget = Number(document.getElementById("budget").value);
+    const btn = document.getElementById("findBtn");
+    const resultDiv = document.getElementById("result");
 
-  // Validation
-  if (!query) {
-    alert("Please enter product name");
-    return;
-  }
-
-  if (!budget || budget <= 0) {
-    alert("Please enter valid budget");
-    return;
-  }
-
-  // Reset UI
-  btn.disabled = true;
-  btn.innerText = "Finding...";
-  loader.style.display = "block";
-  resultDiv.innerHTML = "";
-
-  try {
-    const response = await fetch(
-      "https://ai-product-finder-backend.onrender.com/find-product",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query, budget })
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Server error");
+    if (!query || !budget || budget <= 0) {
+        alert("Valid query aur budget dalo");
+        return;
     }
 
-    const data = await response.json();
+    btn.disabled = true;
+    btn.innerText = "Finding...";
+    document.getElementById("loader").style.display = "block";
+    resultDiv.innerHTML = "";
 
-    // Empty state
-    if (!data.products || data.products.length === 0) {
-      resultDiv.innerHTML = `
-        <p style="text-align:center;">😕 No products found in this budget</p>
-      `;
-      return;
+    try {
+        const response = await fetch(
+            "https://ai-product-finder-backend.onrender.com/find-product",
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ query, budget })
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("Server error");
+        }
+
+        const data = await response.json();
+
+        if (!data.products || data.products.length === 0) {
+            resultDiv.innerHTML = "😕 Is budget me koi product nahi mila.";
+            return;
+        }
+
+        let html = "";
+        data.products.forEach(p => {
+            html += `
+            <div class="product">
+                <h3>${p.name}</h3>
+                <p>💰 Price: ${p.price}</p>
+                <p>⭐ Rating: ${p.rating}</p>
+                <p><b>Best for:</b> ${p.best_for}</p>
+            </div>`;
+        });
+
+        html += `<h3>✅ Final Recommendation</h3>`;
+        html += `<p>${data.final_recommendation}</p>`;
+        html += `<p>${data.reason}</p>`;
+
+        resultDiv.innerHTML = html;
+
+    } catch (err) {
+        resultDiv.innerHTML = "❌ Server issue. Thodi der baad try karo.";
+    } finally {
+        document.getElementById("loader").style.display = "none";
+        btn.disabled = false;
+        btn.innerText = "Find Products";
     }
-
-    let html = "";
-    data.products.forEach(p => {
-      html += `
-        <div class="product">
-          <h3>${p.name}</h3>
-          <p>💰 Price: ${p.price}</p>
-          <p>⭐ Rating: ${p.rating}</p>
-          <p><b>Best for:</b> ${p.best_for}</p>
-        </div>
-      `;
-    });
-
-    html += `
-      <h3 style="margin-top:15px;">
-        ✅ Final Recommendation: ${data.final_recommendation}
-      </h3>
-      <p>${data.reason}</p>
-    `;
-
-    resultDiv.innerHTML = html;
-
-  } catch (err) {
-    resultDiv.innerHTML = `
-      <p style="color:red; text-align:center;">
-        ❌ Server unreachable. Please try again later.
-      </p>
-    `;
-  } finally {
-    loader.style.display = "none";
-    btn.disabled = false;
-    btn.innerText = "Find Products";
-  }
 }
 </script>
+
 
 </body>
 </html>
