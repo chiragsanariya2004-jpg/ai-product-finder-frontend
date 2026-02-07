@@ -234,6 +234,10 @@ html += `
 `;
 
         resultDiv.innerHTML += html;
+    // 🔐 save history
+let history = localStorage.getItem("history") || "";
+history += html;
+localStorage.setItem("history", history);
 
     } catch (err) {
         resultDiv.innerHTML = "❌ Server issue. Thodi der baad try karo.";
@@ -253,6 +257,12 @@ function showAbout(product) {
     `🎯 Best for: ${product.best_for}`
   );
 }
+</script>
+<script>
+window.onload = () => {
+  document.getElementById("result").innerHTML =
+    localStorage.getItem("history") || "";
+};
 </script>
 
 
