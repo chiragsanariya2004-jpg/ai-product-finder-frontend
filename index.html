@@ -173,7 +173,7 @@ async function findProduct() {
     btn.disabled = true;
     btn.innerText = "Finding...";
     document.getElementById("loader").style.display = "block";
-    resultDiv.innerHTML = "";
+  
 
     try {
         const response = await fetch(
