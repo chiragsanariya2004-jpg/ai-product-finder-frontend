@@ -196,22 +196,36 @@ async function findProduct() {
             return;
         }
 
-        let html = "";
-        data.products.forEach(p => {
-            html += `
-            <div class="product">
-                <h3>${p.name}</h3>
-                <p>💰 Price: ${p.price}</p>
-                <p>⭐ Rating: ${p.rating}</p>
-                <p><b>Best for:</b> ${p.best_for}</p>
-            </div>`;
-        });
+        let html = `
+  <hr>
+  <h4>🔍 Query: ${query} | 💰 Budget: ${budget}</h4>
+`;
 
-        html += `<h3>✅ Final Recommendation</h3>`;
-        html += `<p>${data.final_recommendation}</p>`;
-        html += `<p>${data.reason}</p>`;
+data.products.forEach((p, index) => {
+  html += `
+    <div class="product">
+      <h3>${p.name}</h3>
+      <p>💰 Price: ${p.price}</p>
+      <p>⭐ Rating: ${p.rating}</p>
+      <p><b>Best for:</b> ${p.best_for}</p>
 
-        resultDiv.innerHTML = html;
+      <!-- future About button -->
+      <button onclick='showAbout(${JSON.stringify(p)})'>
+        About
+      </button>
+    </div>
+  `;
+});
+
+html += `
+  <div class="final">
+    <h3>✅ Final Recommendation</h3>
+    <p>${data.final_recommendation}</p>
+    <p>${data.reason}</p>
+  </div>
+`;
+
+        resultDiv.innerHTML += html;
 
     } catch (err) {
         resultDiv.innerHTML = "❌ Server issue. Thodi der baad try karo.";
@@ -220,6 +234,16 @@ async function findProduct() {
         btn.disabled = false;
         btn.innerText = "Find Products";
     }
+}
+</script>
+<script>
+function showAbout(product) {
+  alert(
+    `📱 ${product.name}\n\n` +
+    `💰 Price: ${product.price}\n` +
+    `⭐ Rating: ${product.rating}\n` +
+    `🎯 Best for: ${product.best_for}`
+  );
 }
 </script>
 
