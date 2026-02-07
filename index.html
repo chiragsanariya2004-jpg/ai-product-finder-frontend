@@ -164,14 +164,6 @@ async function findProduct() {
     const budget = Number(document.getElementById("budget").value);
     const btn = document.getElementById("findBtn");
     const resultDiv = document.getElementById("result");
-    const safeProducts = data.products.filter(
-  p => Number(p.price) <= budget
-);
-
-if (safeProducts.length === 0) {
-  resultDiv.innerHTML += `<p>😕 Is budget me koi product nahi mila.</p>`;
-  return;
-}
 
     if (!query || !budget || budget <= 0) {
         alert("Valid query aur budget dalo");
@@ -209,7 +201,17 @@ if (safeProducts.length === 0) {
   <h4>🔍 Query: ${query} | 💰 Budget: ${budget}</h4>
 `;
 
-data.products.forEach((p, index) => {
+const safeProducts = data.products.filter(
+  p => Number(p.price) <= budget
+);
+
+if (safeProducts.length === 0) {
+  resultDiv.innerHTML += `<p>😕 Is budget me koi product nahi mila.</p>`;
+  return;
+}
+
+safeProducts.forEach((p) => {
+
   html += `
     <div class="product">
       <h3>${p.name}</h3>
